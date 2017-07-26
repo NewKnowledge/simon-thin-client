@@ -3,14 +3,16 @@ import pandas
 import pickle
 import traceback
 import requests
+from json import JSONDecoder
 from typing import List
 
 
 class SimonThinClient:
     def __init__(self, address: str):
         self.address = address
+        self.decoder = JSONDecoder()
 
-    def processNumpyArray(array: np.ndarray, input_data_shape = None, input_data_types = None, first_value_label = False) -> str:
+    def processNumpyArray(self, array: np.ndarray, input_data_shape = None, input_data_types = None, first_value_label = False) -> str:
         """ Accept a numpy array, process it 
         with the primitive, and return a JSON string
         with the results
@@ -23,20 +25,20 @@ class SimonThinClient:
 
         try:
             r = requests.post(self.address, data = pickle.dumps(array))
-            return r.text
+            return self.decoder.decode(r.text)
         except:
             # Should probably do some more sophisticated error logging here
             return "Failed serializing and posting data to container"
 
 
-    def processArray(array: List[List[str]], input_data_shape = None, input_data_types = None, first_value_label = False) -> str:
+    def processArray(self, array: List[List[str]], input_data_shape = None, input_data_types = None, first_value_label = False) -> str:
         """ Translate the python array to numpy array and pass 
         processing onto processNumpyArray
         """
         return self.processNumpyArray(np.array(array), input_data_shape, input_data_types, first_value_label)
 
 
-    def processDataFrame(frame: pandas.DataFrame) -> str:
+    def processDataFrame(self, frame: pandas.DataFrame) -> str:
         """ Accept a pandas data frame, extract the contents
         into a numpy array, and pass to "processArray"
         frame: a pandas data frame containing the data to be processed
@@ -64,4 +66,5 @@ class SimonThinClient:
 if __name__ == '__main__':
     address = 'http://localhost:5000/'
     client = SimonThinClient(address)
-    client.processArray(np.array([[1,2],[3,4]]))
+    results = client.processArray(np.array([[1,2],[3,4]]))
+    print(results)
