@@ -57,8 +57,8 @@ class SimonThinClient:
         -> a json string containing the results of running the primitive
         """
         try:
-            with open(fileName, 'r') as f:
-                return self.processDataFrame(pandas.read_csv(f))
+            r = requests.post(self.address + "/fileName", data = fileName)
+            return self.decoder.decode(r.text)
         except:
             return "Failed to open file " + str(fileName) + " as csv"
 
