@@ -3,6 +3,7 @@ import pandas
 import pickle
 import traceback
 import requests
+import ast
 from json import JSONDecoder
 from typing import List
 
@@ -50,6 +51,13 @@ class SimonThinClient:
             return "Failed extracting values from data frame"
 
 
+    def translateStringToList(self, listString: str) -> List[str]:
+        """ Provided as a helper function to translate the string of labels
+        for each column into a proper python list of strings. Not sure whether
+        or not we want to expose this, but I'm providing it just in case
+        """
+        return ast.literal_eval(listString)
+
     def processCSVFile(self, fileName):
         """ Accept a local or hosted path to a csv file, load that file
         into a pandas DataFrame, and pass to processDataFrame
@@ -66,5 +74,8 @@ class SimonThinClient:
 if __name__ == '__main__':
     address = 'http://localhost:5000/'
     client = SimonThinClient(address)
-    results = client.processArray(np.array([[1,2],[3,4]]))
+    frame = pandas.read_csv("https://query.data.world/s/10k6mmjmeeu0xlw5vt6ajry05")
+    results = client.processArray(frame.values)
     print(results)
+    decoded = client.translateStringToList(results[1][2])
+    print(decoded[0])
