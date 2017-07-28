@@ -18,7 +18,7 @@ class SimonThinClient:
         with the primitive, and return a JSON string
         with the results
         array: the numpy array to process with the primitive
-        -> a json string containing the results of running the primitive
+        -> a list of JSON strings, one string for each column in the source data
         """
         # Strip labels out -- we dont use them in any of our primitives (yet?)
         if(first_value_label):
