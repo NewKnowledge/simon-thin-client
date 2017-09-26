@@ -1,9 +1,9 @@
 from distutils.core import setup
 
-setup(name='SimonThinClient',
+setup(name='simonThinClient',
     version='1.0',
     description='A thin client for interacting with dockerized simon primitive',
-    packages=['SimonThinClient'],
+    packages=['simonThinClient'],
 #   install_requires=["numpy","pandas","pickle","requests","ast","abc","json","typing"],
 #    entry_points = {
 #        'd3m.primitives': [
