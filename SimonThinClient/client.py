@@ -40,15 +40,17 @@ class SimonThinClient:
 
 
     def processDataFrame(self, frame: pandas.DataFrame) -> str:
-        """ Accept a pandas data frame, extract the contents
-        into a numpy array, and pass to "processArray"
+        """ Accept a pandas data frame, predicts column types in it
         frame: a pandas data frame containing the data to be processed
-        -> a json string containing the results of running the primitive
+        -> a list of lists of column labels
         """
+        
         try:
-            return self.processArray(frame.values)
+            r = requests.post(self.address, data = pickle.dumps(frame))
+            return self.decoder.decode(r.text)
         except:
-            return "Failed extracting values from data frame"
+            # Should probably do some more sophisticated error logging here
+            return "Failed predicting data frame"
 
 
     def translateStringToList(self, listString: str) -> List[str]:
@@ -74,8 +76,7 @@ class SimonThinClient:
 if __name__ == '__main__':
     address = 'http://localhost:5000/'
     client = SimonThinClient(address)
-    frame = pandas.read_csv("https://query.data.world/s/10k6mmjmeeu0xlw5vt6ajry05")
-    results = client.processArray(frame.values)
+    # frame = pandas.read_csv("https://query.data.world/s/10k6mmjmeeu0xlw5vt6ajry05",dtype='str')
+    frame = pandas.read_csv("https://s3.amazonaws.com/d3m-data/merged_o_data/o_4550_merged.csv",dtype='str')
+    results = client.processDataFrame(frame)
     print(results)
-    decoded = client.translateStringToList(results[1][2])
-    print(decoded[0])
