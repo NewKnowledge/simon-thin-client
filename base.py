@@ -1,11 +1,13 @@
 import abc
 from typing import *
 import random
+import sys
 
 __all__ = (
-    'Inputs', 'Outputs', 'Params', 'PrimitiveBase', 'SamplingCompositionalityMixin',
-    'ProbabilisticCompositionalityMixin', 'Scores', 'Gradients', 'GradientCompositionalityMixin',
-    'InspectLossMixin',
+    'Inputs', 'Outputs', 'Params', 'CallMetadata', 'TimeoutError',
+    'PrimitiveBase', 'ContinueFitMixin', 'SamplingCompositionalityMixin',
+    'ProbabilisticCompositionalityMixin', 'Scores', 'Gradients',
+    'GradientCompositionalityMixin', 'InspectLossMixin',
 )
 
 
@@ -22,6 +24,17 @@ CallMetadata = NamedTuple('CallMetadata', [
     ('has_finished', bool),
     ('iterations_done', Optional[int]),
 ])
+
+
+# There is no TimeoutError in Python 2, so we define it ourselves here.
+if sys.version_info[0] == 2:
+    class TimeoutError(OSError):
+        """
+        Timeout expired.
+        """
+else:
+    import builtins
+    TimeoutError = builtins.TimeoutError
 
 
 class PrimitiveBase(Generic[Inputs, Outputs, Params]):
@@ -367,6 +380,9 @@ class ProbabilisticCompositionalityMixin(Generic[Inputs, Outputs, Params]):
         """
 
 
+# TODO: This is not yet a properly defined type which would really be recognized as a named tuple.
+#       Type checking will thus complain if you really return a named tuple from methods, but you
+#       still should. This type will be fixed in the future.
 class Scores(Generic[Params]):
     """
     A type representing a named tuple which holds all the differentiable fields from ``Params``.
@@ -374,6 +390,9 @@ class Scores(Generic[Params]):
     """
 
 
+# TODO: This is not yet a properly defined type which would really be recognized as a named tuple.
+#       Type checking will thus complain if you really return a named tuple from methods, but you
+#       still should. This type will be fixed in the future.
 class Gradients(Generic[Outputs]):
     """
     A type representing a structure of one sample from ``Outputs``, but the values are of type

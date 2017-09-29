@@ -1,17 +1,59 @@
 import numpy as np
 import pandas
 import pickle
-import traceback
 import requests
 import ast
 from json import JSONDecoder
 from typing import List
+from primitive_interfaces.base import PrimitiveBase
 
+Inputs = pandas.frame
+Outputs = List[List[str]]
+Params = dict
+CallMetadata = dict
 
-class simon:
-    def __init__(self, address: str):
+class simon(PrimitiveBase[Inputs, Outputs, Params]):
+    __author__ = "distil"
+    __metadata__ = {}
+    def __init__(self, address: str)-> None:
         self.address = address
         self.decoder = JSONDecoder()
+        self.callMetadata = {}
+        self.params = {}
+
+    def fit(self) -> None:
+        pass
+    
+    def get_params(self) -> Params:
+        return self.params
+
+    def set_params(self, params: Params) -> None:
+        self.params = params
+
+    def get_call_metadata(self) -> CallMetadata:
+        return self.callMetadata
+        
+    def produce(self, *, inputs: Inputs, timeout: float = None, iterations: int = None) -> Outputs:
+        """
+        Produce primitive's best guess for the structural type of each input column.
+        
+        Parameters
+        ----------
+        inputs : Input pandas frame
+        
+        timeout : float
+            A maximum time this primitive should take to produce outputs during this method call, in seconds.
+            Inapplicable for now...
+        iterations : int
+            How many of internal iterations should the primitive do. Inapplicable for now...
+
+        Returns
+        -------
+        Outputs
+            The outputs is a list that has length equal to number of columns in input pandas frame. 
+            Each entry is a list of strings corresponding to each column's multi-label classification.
+        """
+        return self.processDataFrame(Inputs)
 
     def processNumpyArray(self, array: np.ndarray, input_data_shape = None, input_data_types = None, first_value_label = False) -> str:
         """ Accept a numpy array, process it 
