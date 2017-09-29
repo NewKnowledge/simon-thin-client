@@ -8,7 +8,7 @@ from json import JSONDecoder
 from typing import List
 
 
-class SimonThinClient:
+class simon:
     def __init__(self, address: str):
         self.address = address
         self.decoder = JSONDecoder()
@@ -75,7 +75,7 @@ class SimonThinClient:
 
 if __name__ == '__main__':
     address = 'http://localhost:5000/'
-    client = SimonThinClient(address)
+    client = simon(address)
     # frame = pandas.read_csv("https://query.data.world/s/10k6mmjmeeu0xlw5vt6ajry05",dtype='str')
     frame = pandas.read_csv("https://s3.amazonaws.com/d3m-data/merged_o_data/o_4550_merged.csv",dtype='str')
     results = client.processDataFrame(frame)
