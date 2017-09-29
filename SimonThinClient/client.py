@@ -7,7 +7,7 @@ from json import JSONDecoder
 from typing import List
 from primitive_interfaces.base import PrimitiveBase
 
-Inputs = pandas.frame
+Inputs = pandas.DataFrame
 Outputs = List[List[str]]
 Params = dict
 CallMetadata = dict
