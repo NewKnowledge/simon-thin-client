@@ -113,18 +113,6 @@ class simon(PrimitiveBase[Inputs, Outputs, Params]):
             return self.decoder.decode(r.text)
         except:
             return "Failed to open file " + str(fileName) + " as csv"
-            
-    def process(self, file):
-        """ Accept a local or hosted path to a csv file, load that file
-        into a pandas DataFrame, and pass to processDataFrame
-        fileName: the relative or full path to a csv file
-        -> a json string containing the results of running the primitive
-        """
-        try:
-            r = requests.post(self.address + "/upload", data = file)
-            return self.decoder.decode(r.text)
-        except:
-            return "Failed to process file " + str(file) + " as csv"
 
 
 if __name__ == '__main__':
