@@ -121,7 +121,7 @@ class simon(PrimitiveBase[Inputs, Outputs, Params]):
         -> a json string containing the results of running the primitive
         """
         try:
-            files = {'file': open(fileName', 'rb')}
+            files = {'file': open(fileName, 'rb')}
             r = requests.post(self.address + "/fileUpload", files=files, data = fileName)
             return self.decoder.decode(r.text)
         except:
