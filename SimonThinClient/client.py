@@ -103,9 +103,10 @@ class simon(PrimitiveBase[Inputs, Outputs, Params]):
         return ast.literal_eval(listString)
 
     def processCSVFile(self, fileName):
-        """ Accept a local or hosted path to a csv file, load that file
-        into a pandas DataFrame, and pass to processDataFrame
-        fileName: the relative or full path to a csv file
+        """ Accept a hosted path to a csv file, load that file
+        into a pandas DataFrame, and predict classes
+        fileName: the relative or full path to a csv file *on flask container, 
+        i.e., /clusterfiles/, etc
         -> a json string containing the results of running the primitive
         """
         try:
@@ -115,14 +116,14 @@ class simon(PrimitiveBase[Inputs, Outputs, Params]):
             return "Failed to open file " + str(fileName) + " as csv"
             
     def processUploadedCSVFile(self, fileName):
-        """ Accept a local or hosted path to a csv file, load that file
-        into a pandas DataFrame, and pass to processDataFrame
+        """ Accept a local path to a csv file, load that file
+        into request, and pass to flask server for prediction
         fileName: the relative or full path to a csv file
         -> a json string containing the results of running the primitive
         """
         try:
             files = {'file': open(fileName, 'rb')}
-            r = requests.post(self.address + "/fileUpload", files=files, data = fileName)
+            r = requests.post(self.address + "/fileUpload", files=files, data=fileName)
             return self.decoder.decode(r.text)
         except:
             return "Failed to upload and process file " + str(fileName) + " as csv"
