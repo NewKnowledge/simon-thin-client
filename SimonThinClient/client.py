@@ -122,12 +122,8 @@ class simon(PrimitiveBase[Inputs, Outputs, Params]):
         -> a json string containing the results of running the primitive
         """
         try:
-            print("DEBUG::beginning upload")
-            print(fileName)
             files = {'file': open(fileName, 'rb')}
-            print("DEBUG::done opening file, now post")
             r = requests.post(self.address + "/fileUpload", files=files)
-            print("DEBUG::done posting, received result")
             return self.decoder.decode(r.text)
         except:
             return "Failed to upload and process file " + str(fileName) + " as csv"
