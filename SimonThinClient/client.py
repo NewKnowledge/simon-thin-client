@@ -126,7 +126,7 @@ class simon(PrimitiveBase[Inputs, Outputs, Params]):
             print(fileName)
             files = {'file': open(fileName, 'rb')}
             print("DEBUG::done opening file, now post")
-            r = requests.post(self.address + "/fileUpload", files=files, data=fileName)
+            r = requests.post(self.address + "/fileUpload", files=files)
             print("DEBUG::done posting, received result")
             return self.decoder.decode(r.text)
         except:
