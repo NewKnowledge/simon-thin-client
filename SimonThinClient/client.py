@@ -33,19 +33,13 @@ class simon(PrimitiveBase[Inputs, Outputs, Params]):
     def get_call_metadata(self) -> CallMetadata:
         return self.callMetadata
         
-    def produce(self, *, inputs: Inputs, timeout: float = None, iterations: int = None) -> Outputs:
+    def produce(self, inputs: Inputs) -> Outputs:
         """
         Produce primitive's best guess for the structural type of each input column.
         
         Parameters
         ----------
         inputs : Input pandas frame
-        
-        timeout : float
-            A maximum time this primitive should take to produce outputs during this method call, in seconds.
-            Inapplicable for now...
-        iterations : int
-            How many of internal iterations should the primitive do. Inapplicable for now...
 
         Returns
         -------
@@ -53,7 +47,7 @@ class simon(PrimitiveBase[Inputs, Outputs, Params]):
             The outputs is a list that has length equal to number of columns in input pandas frame. 
             Each entry is a list of strings corresponding to each column's multi-label classification.
         """
-        return self.processDataFrame(Inputs)
+        return self.processDataFrame(inputs)
 
     def processNumpyArray(self, array: np.ndarray, input_data_shape = None, input_data_types = None, first_value_label = False) -> str:
         """ Accept a numpy array, process it 
@@ -134,5 +128,5 @@ if __name__ == '__main__':
     client = simon(address)
     # frame = pandas.read_csv("https://query.data.world/s/10k6mmjmeeu0xlw5vt6ajry05",dtype='str')
     frame = pandas.read_csv("https://s3.amazonaws.com/d3m-data/merged_o_data/o_4550_merged.csv",dtype='str')
-    results = client.processDataFrame(frame)
+    results = client.produce(frame)
     print(results)
