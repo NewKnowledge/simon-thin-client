@@ -15,7 +15,7 @@ __author__ = 'Distil'
 __version__ = '1.0.0'
 
 Inputs = container.pandas.DataFrame
-Outputs = container.List[List[str]]
+Outputs = container.List[container.List[str]]
 
 class Params(params.Params):
     pass
