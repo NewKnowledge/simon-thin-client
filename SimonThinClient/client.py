@@ -14,7 +14,7 @@ from d3m_metadata import container, hyperparams, metadata as metadata_module, pa
 __author__ = 'Distil'
 __version__ = '1.0.0'
 
-Inputs = container.pandas.DataFrame
+Inputs = container.List[str,container.pandas.DataFrame]
 Outputs = container.List[container.List[str]]
 
 class Params(params.Params):
@@ -109,8 +109,8 @@ class simon(PrimitiveBase[Inputs, Outputs, Params, Hyperparams]):
 
 if __name__ == '__main__':
     address = 'http://localhost:5000/'
-    client = simon(address)
+    client = simon(hyperparams={})
     # frame = pandas.read_csv("https://query.data.world/s/10k6mmjmeeu0xlw5vt6ajry05",dtype='str')
     frame = pandas.read_csv("https://s3.amazonaws.com/d3m-data/merged_o_data/o_4550_merged.csv",dtype='str')
-    results = client.produce(frame)
+    results = client.produce(list(address,frame))
     print(results)
