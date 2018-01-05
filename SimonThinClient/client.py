@@ -1,3 +1,4 @@
+import os.path
 import numpy as np
 import pandas
 import pickle
@@ -5,35 +6,77 @@ import requests
 import ast
 from json import JSONDecoder
 from typing import List
-from primitive_interfaces.base import PrimitiveBase
+from primitive_interfaces.base import PrimitiveBase, CallResult
+
+from d3m_metadata import container, hyperparams, metadata as metadata_module, params, utils
+
+__author__ = 'Distil'
+__version__ = '1.0.0'
 
 Inputs = pandas.DataFrame
-Outputs = List[List[str]]
-Params = dict
-CallMetadata = dict
+Outputs = container.List[List[str]]
 
-class simon(PrimitiveBase[Inputs, Outputs, Params]):
-    __author__ = "distil"
-    __metadata__ = {}
-    def __init__(self, address: str)-> None:
-        self.address = address
-        self.decoder = JSONDecoder()
-        self.callMetadata = {}
-        self.params = {}
+class Params(params.Params):
+    pass
+
+
+class Hyperparams(hyperparams.Hyperparams):
+    pass
+
+class simon(PrimitiveBase[Inputs, Outputs, Params, Hyperparams]):
+    metadata = metadata_module.PrimitiveMetadata({
+        # Simply an UUID generated once and fixed forever. Generated using "uuid.uuid4()".
+        'id': "d2fa8df2-6517-3c26-bafc-87b701c4043a",
+        'version': __version__,
+        'name': "simon",
+        # Keywords do not have a controlled vocabulary. Authors can put here whatever they find suitable.
+        'keywords': ['Data Type Predictor'],
+        'source': {
+            'name': __author__,
+            'uris': [
+                # Unstructured URIs.
+                "https://github.com/NewKnowledge/simon-thin-client",
+            ],
+        },
+        # A list of dependencies in order. These can be Python packages, system packages, or Docker images.
+        # Of course Python packages can also have their own dependencies, but sometimes it is necessary to
+        # install a Python package first to be even able to run setup.py of another package. Or you have
+        # a dependency which is not on PyPi.
+         'installation': [{
+            'type': metadata_module.PrimitiveInstallationType.PIP,
+            'package_uri': 'git+https://github.com/NewKnowledge/simon-thin-client.git@{git_commit}#subdirectory='.format(
+                git_commit=utils.current_git_commit(os.path.dirname(__file__)),
+            ),
+        }],
+        # The same path the primitive is registered with entry points in setup.py.
+        'python_path': 'd3m.primitives.distil.simon',
+        # Choose these from a controlled vocabulary in the schema. If anything is missing which would
+        # best describe the primitive, make a merge request.
+        'algorithm_types': [
+            metadata_module.PrimitiveAlgorithmType.CONVOLUTIONAL_NEURAL_NET,
+        ],
+        'primitive_family': metadata_module.PrimitiveFamily.DATA_CLEANING,
+    })
+    
+    def __init__(self, *, hyperparams: Hyperparams, random_seed: int = 0, docker_containers: typing.Dict[str, str] = None)-> None:
+        super().__init__(hyperparams=hyperparams, random_seed=random_seed, docker_containers=docker_containers)
+                
+        self._decoder = JSONDecoder()
+        self._params = {}
 
     def fit(self) -> None:
         pass
     
     def get_params(self) -> Params:
-        return self.params
+        return self._params
 
-    def set_params(self, params: Params) -> None:
+    def set_params(self, *, params: Params) -> None:
         self.params = params
 
-    def get_call_metadata(self) -> CallMetadata:
-        return self.callMetadata
+    def set_training_data(self, *, inputs: Inputs, outputs: Outputs) -> None:
+        pass
         
-    def produce(self, inputs: Inputs) -> Outputs:
+    def produce(self, *, inputs: Inputs, timeout: float = None, iterations: int = None) -> CallResult[Outputs]:
         """
         Produce primitive's best guess for the structural type of each input column.
         
@@ -47,80 +90,20 @@ class simon(PrimitiveBase[Inputs, Outputs, Params]):
             The outputs is a list that has length equal to number of columns in input pandas frame. 
             Each entry is a list of strings corresponding to each column's multi-label classification.
         """
-        return self.processDataFrame(inputs)
-
-    def processNumpyArray(self, array: np.ndarray, input_data_shape = None, input_data_types = None, first_value_label = False) -> str:
-        """ Accept a numpy array, process it 
-        with the primitive, and return a JSON string
-        with the results
-        array: the numpy array to process with the primitive
-        -> a list of JSON strings, one string for each column in the source data
-        """
-        # Strip labels out -- we dont use them in any of our primitives (yet?)
-        if(first_value_label):
-            array = array[:,1:]
-
-        try:
-            r = requests.post(self.address, data = pickle.dumps(array))
-            return self.decoder.decode(r.text)
-        except:
-            # Should probably do some more sophisticated error logging here
-            return "Failed serializing and posting data to container"
-
-
-    def processArray(self, array: List[List[str]], input_data_shape = None, input_data_types = None, first_value_label = False) -> str:
-        """ Translate the python array to numpy array and pass 
-        processing onto processNumpyArray
-        """
-        return self.processNumpyArray(np.array(array), input_data_shape, input_data_types, first_value_label)
-
-
-    def processDataFrame(self, frame: pandas.DataFrame) -> str:
+        
         """ Accept a pandas data frame, predicts column types in it
         frame: a pandas data frame containing the data to be processed
         -> a list of lists of column labels
         """
         
+        frame = inputs[1]
+        
         try:
-            r = requests.post(self.address, data = pickle.dumps(frame))
+            r = requests.post(inputs[0], data = pickle.dumps(frame))
             return self.decoder.decode(r.text)
         except:
             # Should probably do some more sophisticated error logging here
             return "Failed predicting data frame"
-
-
-    def translateStringToList(self, listString: str) -> List[str]:
-        """ Provided as a helper function to translate the string of labels
-        for each column into a proper python list of strings. Not sure whether
-        or not we want to expose this, but I'm providing it just in case
-        """
-        return ast.literal_eval(listString)
-
-    def processCSVFile(self, fileName):
-        """ Accept a hosted path to a csv file, load that file
-        into a pandas DataFrame, and predict classes
-        fileName: the relative or full path to a csv file *on flask container, 
-        i.e., /clusterfiles/, etc
-        -> a json string containing the results of running the primitive
-        """
-        try:
-            r = requests.post(self.address + "/fileName", data = fileName)
-            return self.decoder.decode(r.text)
-        except:
-            return "Failed to open file " + str(fileName) + " as csv"
-            
-    def processUploadedCSVFile(self, fileName):
-        """ Accept a local path to a csv file, load that file
-        into request, and pass to flask server for prediction
-        fileName: the relative or full path to a csv file
-        -> a json string containing the results of running the primitive
-        """
-        try:
-            files = {'file': open(fileName, 'rb')}
-            r = requests.post(self.address + "/fileUpload", files=files)
-            return self.decoder.decode(r.text)
-        except:
-            return "Failed to upload and process file " + str(fileName) + " as csv"
 
 
 if __name__ == '__main__':
