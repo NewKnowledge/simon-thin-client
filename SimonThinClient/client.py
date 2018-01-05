@@ -14,7 +14,7 @@ from d3m_metadata import container, hyperparams, metadata as metadata_module, pa
 __author__ = 'Distil'
 __version__ = '1.0.0'
 
-Inputs = container.List[str,container.pandas.DataFrame]
+Inputs = container.pandas.DataFrame
 Outputs = container.List[container.List[str]]
 
 class Params(params.Params):
@@ -59,11 +59,12 @@ class simon(PrimitiveBase[Inputs, Outputs, Params, Hyperparams]):
         'primitive_family': metadata_module.PrimitiveFamily.DATA_CLEANING,
     })
     
-    def __init__(self, *, hyperparams: Hyperparams, random_seed: int = 0, docker_containers: typing.Dict[str, str] = None)-> None:
-        super().__init__(hyperparams=hyperparams, random_seed=random_seed, docker_containers=docker_containers)
+    def __init__(self, *, address:str, hyperparams: Hyperparams, random_seed: int = 0, docker_containers: typing.Dict[str, str] = None)-> None:
+        super().__init__(address=address,hyperparams=hyperparams, random_seed=random_seed, docker_containers=docker_containers)
                 
         self._decoder = JSONDecoder()
         self._params = {}
+        self._address = address
 
     def fit(self) -> None:
         pass
@@ -97,10 +98,10 @@ class simon(PrimitiveBase[Inputs, Outputs, Params, Hyperparams]):
         -> a list of lists of column labels
         """
         
-        frame = inputs[1]
+        frame = inputs
         
         try:
-            r = requests.post(inputs[0], data = pickle.dumps(frame))
+            r = requests.post(self._address, data = pickle.dumps(frame))
             return self.decoder.decode(r.text)
         except:
             # Should probably do some more sophisticated error logging here
@@ -109,8 +110,8 @@ class simon(PrimitiveBase[Inputs, Outputs, Params, Hyperparams]):
 
 if __name__ == '__main__':
     address = 'http://localhost:5000/'
-    client = simon(hyperparams={})
+    client = simon(address=address,hyperparams={})
     # frame = pandas.read_csv("https://query.data.world/s/10k6mmjmeeu0xlw5vt6ajry05",dtype='str')
     frame = pandas.read_csv("https://s3.amazonaws.com/d3m-data/merged_o_data/o_4550_merged.csv",dtype='str')
-    results = client.produce(list(address,frame))
+    results = client.produce(frame)
     print(results)
