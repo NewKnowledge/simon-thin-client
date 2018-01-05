@@ -112,5 +112,5 @@ if __name__ == '__main__':
     client = simon(hyperparams={})
     # frame = pandas.read_csv("https://query.data.world/s/10k6mmjmeeu0xlw5vt6ajry05",dtype='str')
     frame = pandas.read_csv("https://s3.amazonaws.com/d3m-data/merged_o_data/o_4550_merged.csv",dtype='str')
-    results = client.produce(list([address,frame]))
+    results = client.produce(inputs = list([address,frame]))
     print(results)
