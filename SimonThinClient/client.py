@@ -53,7 +53,7 @@ class simon(PrimitiveBase[Inputs, Outputs, Params, Hyperparams]):
         # Choose these from a controlled vocabulary in the schema. If anything is missing which would
         # best describe the primitive, make a merge request.
         'algorithm_types': [
-            metadata_module.PrimitiveAlgorithmType.CONVOLUTIONAL_NEURAL_NET,
+            metadata_module.PrimitiveAlgorithmType.CONVOLUTIONAL_NEURAL_NETWORK,
         ],
         'primitive_family': metadata_module.PrimitiveFamily.DATA_CLEANING,
     })
