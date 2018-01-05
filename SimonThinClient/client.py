@@ -4,6 +4,7 @@ import pandas
 import pickle
 import requests
 import ast
+import typing
 from json import JSONDecoder
 from typing import List
 from primitive_interfaces.base import PrimitiveBase, CallResult
