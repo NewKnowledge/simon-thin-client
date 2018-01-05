@@ -14,7 +14,7 @@ from d3m_metadata import container, hyperparams, metadata as metadata_module, pa
 __author__ = 'Distil'
 __version__ = '1.0.0'
 
-Inputs = pandas.DataFrame
+Inputs = container.pandas.DataFrame
 Outputs = container.List[List[str]]
 
 class Params(params.Params):
