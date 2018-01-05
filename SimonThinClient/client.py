@@ -46,7 +46,7 @@ class simon(PrimitiveBase[Inputs, Outputs, Params, Hyperparams]):
          'installation': [{
             'type': metadata_module.PrimitiveInstallationType.PIP,
             'package_uri': 'git+https://github.com/NewKnowledge/simon-thin-client.git@{git_commit}#subdirectory='.format(
-                git_commit="0465af54666125c7ae1c3ca6e9d5807e52dff573",
+                git_commit=utils.current_git_commit(os.path.dirname(__file__)),
             ),
         }],
         # The same path the primitive is registered with entry points in setup.py.
