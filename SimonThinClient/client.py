@@ -101,7 +101,7 @@ class simon(PrimitiveBase[Inputs, Outputs, Params, Hyperparams]):
         
         try:
             r = requests.post(inputs[0], data = pickle.dumps(frame))
-            return self.decoder.decode(r.text)
+            return self._decoder.decode(r.text)
         except:
             # Should probably do some more sophisticated error logging here
             return "Failed predicting data frame"
@@ -112,5 +112,5 @@ if __name__ == '__main__':
     client = simon(hyperparams={})
     # frame = pandas.read_csv("https://query.data.world/s/10k6mmjmeeu0xlw5vt6ajry05",dtype='str')
     frame = pandas.read_csv("https://s3.amazonaws.com/d3m-data/merged_o_data/o_4550_merged.csv",dtype='str')
-    results = client.produce(inputs = list([address,frame]))
-    print(results)
+    result = client.produce(inputs = list([address,frame]))
+    print(result)
