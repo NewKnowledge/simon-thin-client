@@ -88,13 +88,14 @@ class simon(PrimitiveBase[Inputs, Outputs, Params, Hyperparams]):
         Returns
         -------
         Outputs
-            The outputs is a list that has length equal to number of columns in input pandas frame. 
-            Each entry is a list of strings corresponding to each column's multi-label classification.
+            The outputs is two lists of lists, each has length equal to number of columns in input pandas frame. 
+            Each entry of the first one is a list of strings corresponding to each column's multi-label classification.
+            Each entry of the second one is a list of floats corresponding to prediction probabilities.
         """
         
         """ Accept a pandas data frame, predicts column types in it
         frame: a pandas data frame containing the data to be processed
-        -> a list of lists of column labels
+        -> a list of two lists of lists of 1) column labels and then 2) prediction probabilities
         """
         
         frame = inputs[1]
