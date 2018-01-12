@@ -2,8 +2,7 @@
 Thin client for interacting with dockerized simon TA1 primitive. All code is written in Python 3.5 and must be run in 3.5 or greater. 
 
 ## Output
-The output for every function should be as follows:
-A list of two list of lists. 
+The output should be a list of two list of lists. 
 
 The first is a list of multilabel label strings (ordered the same as columns).
 
